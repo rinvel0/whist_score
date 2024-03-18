@@ -1,56 +1,59 @@
-extern crate gtk;
+use gtk::glib::GString;
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Button, Entry, Grid, Label};
+use gtk::{glib, Application, ApplicationWindow, Button, Entry, Grid, Label};
 
-pub fn run_gui() {
-    // Application
-    let app = Application::builder()
-        .application_id("com.rinvel0.whistscore")
+pub fn build_ui(app: &Application) {
+    // Grid
+    let grid = Grid::builder()
+        .visible(true)
+        .column_spacing(12)
+        .visible(true)
+        .row_spacing(5)
         .build();
+    // Player Name Entry
+    let player_entry = Entry::builder()
+        .margin_top(12)
+        .margin_bottom(12)
+        .margin_start(12)
+        .margin_end(12)
+        .build();
+    grid.attach(&player_entry, 0, 0, 1, 1);
+    // Create a button with label and margins
+    let button = Button::builder()
+        .label("Add Player")
+        .margin_top(12)
+        .margin_bottom(12)
+        .margin_start(12)
+        .margin_end(12)
+        .build();
+    grid.attach(&button, 1, 0, 1, 1);
 
-    app.connect_activate(|app| {
-        let window = ApplicationWindow::builder()
-            .application(app)
-            .title("Whist Score Keeper")
-            .default_width(400)
-            .default_height(300)
-            .build();
+    let player1_label = Label::new(None);
+    grid.attach(&player1_label, 0, 1, 15, 1);
+    let player2_label = Label::new(None);
+    grid.attach(&player2_label, 1, 1, 15, 1);
+    let player3_label = Label::new(None);
+    grid.attach(&player3_label, 2, 1, 15, 1);
+    let player4_label = Label::new(None);
+    grid.attach(&player4_label, 3, 1, 15, 1);
 
-        let grid = Grid::builder()
-            .margin(10)
-            .column_spacing(5)
-            .row_spacing(5)
-            .build();
-
-        let entry = Entry::builder().build();
-        grid.attach(&entry, 0, 0, 1, 1);
-
-        let button = Button::with_label("Draw Table");
-        grid.attach(&button, 1, 0, 1, 1);
-
-        // Create a label to display the table
-        let table_label = Label::new(None);
-        grid.attach(&table_label, 0, 1, 2, 1);
-
-        // Connect button click event
-        button.connect_clicked(move |_| {
-            // Get numbers from entry
-            let numbers_str = entry.text().trim().to_string();
-            let numbers: Vec<&str> = numbers_str.split_whitespace().collect();
-
-            // Create a table string
-            let mut table_str = String::new();
-            for num in &numbers {
-                table_str.push_str(&format!("{}\n", num));
-            }
-
-            // Set the table text
-            table_label.set_text(&table_str);
-        });
-
-        window.set_child(Some(&grid));
-        window.show_all();
+    // Connect to "clicked" signal of `button`
+    button.connect_clicked(move |_| {
+        let text = &player_entry.text();
+        player1_label.set_text(text);
+        player2_label.set_text(text);
+        player3_label.set_text(text);
+        player4_label.set_text(text);
     });
 
-    app.run();
+    // Create a window
+    let window = ApplicationWindow::builder()
+        .application(app)
+        .title("My GTK App")
+        .child(&grid)
+        .build();
+
+    // Present window
+    window.present();
 }
+
